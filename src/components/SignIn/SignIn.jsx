@@ -1,29 +1,32 @@
 import React, { useRef, useState } from 'react';
-import { signUp } from '../services/authService';
+import { signIn } from '../features/auth/services/authService';
 
-const SignUp = () => {
+const SignIn = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async e => {
     e.preventDefault();
+    setMessage({ type: '', text: '' });
+
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
-
-    setMessage({ type: '', text: '' });
 
     if (!email || !password) {
       setMessage({ type: 'error', text: 'Completá todos los campos.' });
       return;
     }
 
-    const { data, error } = await signUp(email, password);
+    setLoading(true);
+    const { data, error } = await signIn(email, password);
+    setLoading(false);
 
     if (error) {
       setMessage({ type: 'error', text: error.message });
     } else {
-      setMessage({ type: 'success', text: `Verificá tu correo: ${data.user.email}` });
+      setMessage({ type: 'success', text: `Bienvenido ${data.user.email}` });
     }
   };
 
@@ -31,10 +34,10 @@ const SignUp = () => {
     <form onSubmit={handleSubmit}>
       <input ref={emailRef} type="email" placeholder="Email" required />
       <input ref={passwordRef} type="password" placeholder="Contraseña" required />
-      <button type="submit">Registrarse</button>
+      <button type="submit">{loading ? 'Cargando...' : 'Ingresar'}</button>
       {message.text && <p className={message.type}>{message.text}</p>}
     </form>
   );
 };
 
-export default SignUp;
+export default SignIn;
