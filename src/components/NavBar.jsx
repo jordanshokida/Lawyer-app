@@ -1,1 +1,0 @@
-//Logo del estudio a la izquierda, Quienes somos, Faqs, signIn, SignUp 
