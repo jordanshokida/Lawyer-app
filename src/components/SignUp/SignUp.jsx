@@ -1,40 +1,65 @@
 import React, { useRef, useState } from 'react';
-import { signUp } from '../features/auth/services/authService';
+import styles from "./SignUp.module.css"
+import { useNavigate } from 'react-router';
+//import { useUserStorage } from '../../stores/useUserStorage';
+import { supabase } from '../../auth/supabase.auth';
+import { signUp } from '../../auth/auth.service';
 
-const SignUp = () => {
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const [message, setMessage] = useState({ type: '', text: '' });
+export default function SignUp() {
+  const emailRef = useRef('');
+  const passwordRef = useRef('');
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    const email = emailRef.current.value;
-    const password = passwordRef.current.value;
+  const { setUser, setFavorites } = useUserStorage()
 
-    setMessage({ type: '', text: '' });
+  const handleSignup = async () => {
+    setLoading(true);
+    setError(null);
+    try {
 
-    if (!email || !password) {
-      setMessage({ type: 'error', text: 'Completá todos los campos.' });
-      return;
+      const { user } = await signUp(emailRef.current.value, passwordRef.current.value);
+
+      console.log(user);
+
+      navigate("/signin")
+
+    } catch (err) {
+      console.error(err.message);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-
-    const { data, error } = await signUp(email, password);
-
-    if (error) {
-      setMessage({ type: 'error', text: error.message });
-    } else {
-      setMessage({ type: 'success', text: `Verificá tu correo: ${data.user.email}` });
-    }
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input ref={emailRef} type="email" placeholder="Email" required />
-      <input ref={passwordRef} type="password" placeholder="Contraseña" required />
-      <button type="submit">Registrarse</button>
-      {message.text && <p className={message.type}>{message.text}</p>}
-    </form>
-  );
-};
+    <div className={styles.container}>
+      <h2 className={styles.title}>Registrarse</h2>
 
-export default SignUp;
+      <input
+        ref={emailRef}
+        type="email"
+        placeholder="Email"
+        className={styles.input}
+      />
+
+      <input
+        ref={passwordRef}
+        type="password"
+        placeholder="Contraseña"
+        className={styles.input}
+      />
+
+      <button
+        onClick={handleSignup}
+        disabled={loading}
+        className={styles.button}
+      >
+        {loading ? 'Cargando...' : 'Registrarse'}
+      </button>
+
+      {error && <p className={styles.error}>{error}</p>}
+    </div>
+  );
+}

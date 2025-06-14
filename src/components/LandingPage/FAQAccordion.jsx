@@ -1,3 +1,4 @@
+// src/components/LandingPage/FAQAccordion.jsx
 import React, { useState } from 'react';
 
 const faqs = [
@@ -23,20 +24,20 @@ const FAQAccordion = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 mt-10">
-      <h2 className="text-2xl font-bold mb-6 text-center">Preguntas frecuentes</h2>
-      <div className="border rounded divide-y">
+    <div className="max-w-6xl mx-auto px-4 py-12 bg-[#fdf6e3] rounded-xl shadow-md mt-10">
+      <h2 className="text-3xl font-bold text-center text-[#4b1c1c] mb-8">Preguntas frecuentes</h2>
+      <div className="divide-y divide-[#cbbaba]">
         {faqs.map((faq, i) => (
           <div key={i}>
             <button
               onClick={() => toggleIndex(i)}
-              className="w-full text-left px-4 py-3 flex justify-between items-center focus:outline-none"
+              className="w-full text-left px-4 py-4 flex justify-between items-center focus:outline-none text-[#4b1c1c] hover:bg-[#faebd7] rounded-md"
             >
-              <span className="font-semibold">{faq.question}</span>
-              <span>{openIndex === i ? '-' : '+'}</span>
+              <span className="font-medium text-lg">{faq.question}</span>
+              <span className="text-xl">{openIndex === i ? '-' : '+'}</span>
             </button>
             {openIndex === i && (
-              <div className="px-4 py-3 text-gray-700 bg-gray-50">{faq.answer}</div>
+              <div className="px-6 pb-4 text-[#5a2e2e] bg-[#fef9f3] rounded-b-md">{faq.answer}</div>
             )}
           </div>
         ))}
@@ -46,3 +47,4 @@ const FAQAccordion = () => {
 };
 
 export default FAQAccordion;
+

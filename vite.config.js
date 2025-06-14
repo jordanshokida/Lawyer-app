@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 //
 const manifestForPlugin = {
   registerType: 'autoUpdate',
-  includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'chile.png'],
+  includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logo.png'],
   strategies: 'generateSW',
   manifest: {
     name: 'RecetApp',
@@ -21,7 +21,7 @@ const manifestForPlugin = {
     orientation: 'portrait',
     icons: [
       {
-        src: 'chile.png',
+        src: 'logo.png',
         sizes: '192x192',
         type: 'image/png',
         purpose: 'any'

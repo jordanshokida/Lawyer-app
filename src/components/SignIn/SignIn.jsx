@@ -1,43 +1,74 @@
 import React, { useRef, useState } from 'react';
-import { signIn } from '../features/auth/services/authService';
+import styles from "./SignIn.module.css"
+import { useNavigate } from 'react-router';
+import { signIn } from '../../auth/auth.service';
+//import { useUserStorage } from '../../stores/useUserStorage';
+import { supabase } from '../../auth/supabase.auth';
 
-const SignIn = () => {
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const [message, setMessage] = useState({ type: '', text: '' });
+export default function SignIn() {
+  const emailRef = useRef('');
+  const passwordRef = useRef('');
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setMessage({ type: '', text: '' });
+  const { setUser, setFavorites } = useUserStorage()
 
-    const email = emailRef.current.value;
-    const password = passwordRef.current.value;
-
-    if (!email || !password) {
-      setMessage({ type: 'error', text: 'Completá todos los campos.' });
-      return;
-    }
-
+  const handleLogin = async () => {
     setLoading(true);
-    const { data, error } = await signIn(email, password);
-    setLoading(false);
+    setError(null);
+    try {
 
-    if (error) {
-      setMessage({ type: 'error', text: error.message });
-    } else {
-      setMessage({ type: 'success', text: `Bienvenido ${data.user.email}` });
+      const { user } = await signIn(emailRef.current.value, passwordRef.current.value);
+
+      setUser(user)
+
+      const { data: fav, error } = await supabase
+        .from("favorites")
+        .select("recipe_id")
+        .eq("user_id", user.id)
+
+
+      let setInitData = fav ? fav.map(f => f.recipe_id) : []
+
+      setFavorites(setInitData)
+
+      navigate("/profile")
+    } catch (err) {
+      console.error(err.message);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input ref={emailRef} type="email" placeholder="Email" required />
-      <input ref={passwordRef} type="password" placeholder="Contraseña" required />
-      <button type="submit">{loading ? 'Cargando...' : 'Ingresar'}</button>
-      {message.text && <p className={message.type}>{message.text}</p>}
-    </form>
-  );
-};
+    <div className={styles.container}>
+      <h2 className={styles.title}>Login</h2>
 
-export default SignIn;
+      <input
+        ref={emailRef}
+        type="email"
+        placeholder="Email"
+        className={styles.input}
+      />
+
+      <input
+        ref={passwordRef}
+        type="password"
+        placeholder="Contraseña"
+        className={styles.input}
+      />
+
+      <button
+        onClick={handleLogin}
+        disabled={loading}
+        className={styles.button}
+      >
+        {loading ? 'Cargando...' : 'Entrar'}
+      </button>
+
+      {error && <p className={styles.error}>{error}</p>}
+    </div>
+  );
+}
