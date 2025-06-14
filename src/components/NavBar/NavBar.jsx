@@ -73,8 +73,7 @@ const NavBar = () => {
 export default NavBar*/
 
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router';
-
+import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '/logo.png';
 import './NavBar.css';
 import { supabase } from '../../auth/supabase.auth';
@@ -117,26 +116,51 @@ const NavBar = () => {
                 <div className={`NavBar__links ${menuOpen ? 'is-active' : ''}`}>
                     {isLoggedIn ? (
                         <>
-                            <NavLink to="/profile" className={linkClass} onClick={closeMenu}>Perfil</NavLink>
-                            <button onClick={handleSignOut} className="NavBar__link NavBar__link--button">Cerrar sesión</button>
+                            <NavLink to="/" className={linkClass} onClick={closeMenu}>
+                                Inicio
+                            </NavLink>
+                            <NavLink to="/profile" className={linkClass} onClick={closeMenu}>
+                                Perfil
+                            </NavLink>
+                            <NavLink to="/turnos" className={linkClass} onClick={closeMenu}>
+                                Turnos
+                            </NavLink>
+                            <button
+                                onClick={() => {
+                                    handleSignOut();
+                                    closeMenu();
+                                }}
+                                className="NavBar__link NavBar__link--button"
+                            >
+                                Cerrar sesión
+                            </button>
                         </>
                     ) : (
                         <>
-                            <NavLink to="/signin" className={linkClass} onClick={closeMenu}>Ingresar</NavLink>
-                            <NavLink to="/signup" className={linkClass} onClick={closeMenu}>Registrarse</NavLink>
+                            <NavLink to="/" className={linkClass} onClick={closeMenu}>
+                                Volver al inicio
+                            </NavLink>
+                            <NavLink to="/signin" className={linkClass} onClick={closeMenu}>
+                                Ingresar
+                            </NavLink>
+                            <NavLink to="/signup" className={linkClass} onClick={closeMenu}>
+                                Registrarse
+                            </NavLink>
                         </>
                     )}
+
                 </div>
 
                 <div className="NavBar__right">
-                    {/* <span className="NavBar__user">{user?.email.split('@')[0]}</span> */}
+                    
                     <button className="NavBar__toggle" onClick={() => setMenuOpen(!menuOpen)}>
                         ☰
                     </button>
                 </div>
-            </nav>
+            </nav >
 
-            {menuOpen && <div className="NavBar__backdrop" onClick={closeMenu}></div>}
+            {menuOpen && <div className="NavBar__backdrop" onClick={closeMenu}></div>
+            }
         </>
     );
 };

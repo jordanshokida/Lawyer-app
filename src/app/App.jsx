@@ -5,10 +5,12 @@ import NavBar from "../components/NavBar/NavBar"
 
 const App = () => {
   return (
-    <div className="bg-[#fdf6e3] min-h-screen">
+    <div className="bg-[#fdf6e3] min-h-screen flex flex-col">
       <BrowserRouter>
-        <NavBar/>
-        <Router />
+        <NavBar />
+        <div className="flex-grow">
+          <Router />
+        </div>
       </BrowserRouter>
     </div>
   )
