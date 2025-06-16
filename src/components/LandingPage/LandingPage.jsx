@@ -7,7 +7,6 @@ const LandingPage = () => {
     <div >
       <LegalLanding />
       <FAQAccordion />
-      <FooterInfo />
     </div>
   )
 }

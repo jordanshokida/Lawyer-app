@@ -1,7 +1,12 @@
-import { Navigate, Outlet } from 'react-router'
+import { Navigate } from 'react-router-dom'
+import { useUserStorage } from '../stores/useUserStorage'
 
-export const ProtectedRoute = ({ isAuthenticated }) => {
-    return isAuthenticated ? <Outlet /> : <Navigate to="/" reset />
+export default function ProtectedRoute({ children }) {
+  const user = useUserStorage(state => state.user)
+  const loading = useUserStorage(state => state.loading)
+
+  if (loading) return <div>Cargando...</div>
+  if (!user) return <Navigate to="/signin" replace />
+  
+  return children
 }
-
-export default ProtectedRoute

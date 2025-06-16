@@ -1,65 +1,192 @@
-import React, { useRef, useState } from 'react';
-import styles from "./SignUp.module.css"
-import { useNavigate } from 'react-router';
-//import { useUserStorage } from '../../stores/useUserStorage';
-import { supabase } from '../../auth/supabase.auth';
-import { signUp } from '../../auth/auth.service';
+// src/components/SignUp/SignUp.jsx
+/*import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useUserStorage } from '../../stores/useUserStorage';
 
 export default function SignUp() {
-  const emailRef = useRef('');
-  const passwordRef = useRef('');
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+    phone: ''
+  });
+  const { signUp, loading, error } = useUserStorage();
+  const navigate = useNavigate();
 
-  const { setUser, setFavorites } = useUserStorage()
-
-  const handleSignup = async () => {
-    setLoading(true);
-    setError(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-
-      const { user } = await signUp(emailRef.current.value, passwordRef.current.value);
-
-      console.log(user);
-
-      navigate("/signin")
-
+      await signUp(
+        formData.email,
+        formData.password,
+        formData.fullName,
+        formData.phone
+      );
+      navigate('/signin'); // Redirige al login después del registro
     } catch (err) {
-      console.error(err.message);
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      console.error("Error en registro:", err);
     }
-  }
+  };
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Registrarse</h2>
+    <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
+      <h2 className="text-2xl font-bold mb-4">Registrarse</h2>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          value={formData.fullName}
+          onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+          placeholder="Nombre completo"
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="tel"
+          value={formData.phone}
+          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+          placeholder="Teléfono"
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({...formData, email: e.target.value})}
+          placeholder="Email"
+          className="w-full p-2 border rounded"
+          required
+        />
+        <input
+          type="password"
+          value={formData.password}
+          onChange={(e) => setFormData({...formData, password: e.target.value})}
+          placeholder="Contraseña"
+          className="w-full p-2 border rounded"
+          minLength={6}
+          required
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-600 text-white p-2 rounded disabled:bg-gray-400"
+        >
+          {loading ? 'Registrando...' : 'Crear cuenta'}
+        </button>
+      </form>
+    </div>
+  );
+}*/
 
-      <input
-        ref={emailRef}
-        type="email"
-        placeholder="Email"
-        className={styles.input}
-      />
+// src/components/SignUp/SignUp.jsx
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useUserStorage } from '../../stores/useUserStorage';
 
-      <input
-        ref={passwordRef}
-        type="password"
-        placeholder="Contraseña"
-        className={styles.input}
-      />
+export default function SignUp() {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+    phone: ''
+  });
+  
+  const { signUp, loading, error } = useUserStorage();
+  const navigate = useNavigate();
 
-      <button
-        onClick={handleSignup}
-        disabled={loading}
-        className={styles.button}
-      >
-        {loading ? 'Cargando...' : 'Registrarse'}
-      </button>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await signUp(
+        formData.email,
+        formData.password,
+        formData.fullName,
+        formData.phone
+      );
+      navigate('/signin'); // Redirige al login después del registro
+    } catch (err) {
+      console.error("Error en registro:", err);
+    }
+  };
 
-      {error && <p className={styles.error}>{error}</p>}
+  return (
+    <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
+      <h2 className="text-2xl font-bold mb-4">Registro de Cliente</h2>
+      
+      {/* Mostrar error si existe */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+
+      {/* Formulario de registro */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block mb-1">Nombre Completo</label>
+          <input
+            type="text"
+            value={formData.fullName}
+            onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1">Teléfono</label>
+          <input
+            type="tel"
+            value={formData.phone}
+            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1">Email</label>
+          <input
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({...formData, email: e.target.value})}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block mb-1">Contraseña</label>
+          <input
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData({...formData, password: e.target.value})}
+            className="w-full p-2 border rounded"
+            minLength={6}
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-600 text-white p-2 rounded disabled:bg-gray-400"
+        >
+          {loading ? 'Registrando...' : 'Crear cuenta'}
+        </button>
+      </form>
+
+      {/* Enlace para volver a login */}
+      <div className="mt-4 text-center">
+        <span className="text-gray-600">¿Ya tienes cuenta? </span>
+        <Link 
+          to="/signin" 
+          className="text-blue-600 hover:underline"
+        >
+          Inicia sesión
+        </Link>
+      </div>
     </div>
   );
 }

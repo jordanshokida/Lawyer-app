@@ -1,124 +1,98 @@
-/*import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { supabase } from "../auth/supabase.auth";
-import { fetchAllRecetasById } from "../features/recetas/service/receta.service";
+// src/stores/useUserStorage.js
+import { create } from 'zustand';
+import { supabase } from '../auth/supabase.auth';
 
+export const useUserStorage = create((set, get) => ({
+  user: null,
+  loading: false,
+  error: null,
 
-const dataToPersit = persist(
-    (set, get) => ({
-        user: null,
-        favoriteIds: [],
-        favoriteRecetas: [],
-
-        setUser: user => set({ user }),
-        setFavorites: ids => set({ favoriteIds: ids }),
-        setFavoriteRecetas: recetas => set({ favoriteRecetas: recetas }),
-
-        addFavorite: async (id) => {
-            const { user, favoriteIds, favoriteRecetas } = get()
-            const normalizedId = Number(id)
-
-
-
-            if (favoriteIds.includes(normalizedId)) {
-                console.log("Ya se encuentra en mi lista");
-                return
-            }
-
-
-            try {
-                const { data: existData, error: checkError } = await supabase
-                    .from("favorites")
-                    .select("recipe_id")
-                    .eq("user_id", user.id)
-                    .eq("recipe_id", normalizedId)
-                    .maybeSingle()
-
-                console.log(existData);
-
-
-                if (!existData) {
-
-                    const { error: insertionError } = await supabase
-                        .from("favorites")
-                        .insert([{ user_id: user.id, recipe_id: normalizedId }])
-
-                    if (insertionError) throw insertionError
-
-
-                    set({
-                        favoriteIds: [...favoriteIds, normalizedId]
-                    })
-
-
-                }
-
-
-
-
-
-            } catch (error) {
-                console.error('Error al agregar favorito:', error)
-
-            }
-
-        },
-
-        removeFavorite: async (id) => {
-            const normalizedId = Number(id)
-            const { user, favoriteIds, favoriteRecetas } = get()
-
-            const { error } = await supabase
-                .from('favorites')
-                .delete()
-                .eq('user_id', user.id)
-                .eq('recipe_id', normalizedId)
-
-            if (error) throw new Error(" Opps algo malio sal");
-
-
-            const new_recipes = favoriteIds.filter(r => r != normalizedId)
-
-            set(
-                {
-                    favoriteIds: new_recipes
-                }
-            )
-
-
-        },
-        loadFavoriteRecetas: async () => {
-            const ids = get().favoriteIds
-            if (!ids || ids.length === 0) return set({ favoriteRecetas: [] })
-
-            set({ loadingFavorites: true, favoritesError: null })
-
-            try {
-                const recetas = await fetchAllRecetasById(ids)
-                set({ favoriteRecetas: recetas })
-            } catch (error) {
-                console.error('Error al cargar recetas favoritas:', error)
-                set({ favoritesError: 'Error al cargar favoritos' })
-            } finally {
-                set({ loadingFavorites: false })
-            }
-        },
-        reset: () =>
-            set({
-                user: null,
-                favoriteIds: [],
-                favoriteRecetas: []
-            })
-    })
-    ,
-    {
-        name: 'user-storage',
-        partialize: (state) => ({
-            user: state.user,
-            favoriteIds: state.favoriteIds,
-            favoriteRecetas: state.favoriteRecetas
-        })
+  // Inicializar sesión (ejecutar al cargar la app)
+  initializeSession: async () => {
+    set({ loading: true });
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      set({ user: session?.user || null });
+    } catch (err) {
+      set({ error: err.message });
+    } finally {
+      set({ loading: false });
     }
-)
+  },
 
-export const useUserStorage = create(dataToPersit)*/
+  // Registro de usuario
+  signUp: async (email, password, fullName, phone) => {
+    set({ loading: true, error: null });
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName, phone }
+        }
+      });
+      if (error) throw error;
+      set({ user: data.user });
+      return data.user;
+    } catch (err) {
+      set({ error: err.message });
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  // Inicio de sesión
+  signIn: async (email, password) => {
+    set({ loading: true, error: null });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      set({ user: data.user });
+      return data.user;
+    } catch (err) {
+      set({ error: 'Credenciales incorrectas. Intenta nuevamente.' });
+      throw err;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+
+  // src/stores/useUserStorage.js
+signOut: async () => {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    
+    set({ 
+      user: null,
+      loading: false,
+      error: null
+    });
+  } catch (err) {
+    set({ error: err.message });
+  }
+}
+}));
+
+
+  // Cerrar sesión
+/*signOut: async () => {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    
+    // Limpia el localStorage manualmente
+    localStorage.removeItem('sb-' + supabase.supabaseUrl.split('//')[1].split('.')[0] + '-auth-token');
+    
+    set({ 
+      user: null,
+      error: null 
+    });
+  } catch (err) {
+    set({ error: err.message });
+    throw err;
+  }
+}
+}));*/
