@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '/logo.png';
 import './NavBar.css';
 import { supabase } from '../../auth/supabase.auth';
-import { useUserStorage } from '../stores/useUserStorage';
+
 
 
 const NavBar = () => {
