@@ -1,4 +1,3 @@
-// src/stores/useUserStorage.js
 import { create } from 'zustand';
 import { supabase } from '../auth/supabase.auth';
 
@@ -75,24 +74,3 @@ signOut: async () => {
   }
 }
 }));
-
-
-  // Cerrar sesión
-/*signOut: async () => {
-  try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    
-    // Limpia el localStorage manualmente
-    localStorage.removeItem('sb-' + supabase.supabaseUrl.split('//')[1].split('.')[0] + '-auth-token');
-    
-    set({ 
-      user: null,
-      error: null 
-    });
-  } catch (err) {
-    set({ error: err.message });
-    throw err;
-  }
-}
-}));*/

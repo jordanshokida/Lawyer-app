@@ -1,6 +1,3 @@
-// src/components/LandingPage/FooterInfo.jsx
-import React from 'react';
-
 const FooterInfo = () => {
   return (
     <footer className="bg-[#4b1c1c] text-[#fdf6e3] py-8 mt-20">

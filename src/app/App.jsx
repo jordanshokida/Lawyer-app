@@ -1,4 +1,3 @@
-// src/app/App.jsx
 import { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { useUserStorage } from '../stores/useUserStorage';

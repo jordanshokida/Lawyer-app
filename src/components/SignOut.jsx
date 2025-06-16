@@ -1,22 +1,3 @@
-// src/components/SignOut.jsx
-/*import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useUserStorage } from '../stores/useUserStorage';
-
-const SignOut = () => {
-  const navigate = useNavigate();
-  const { signOut } = useUserStorage();
-
-  useEffect(() => {
-    signOut().then(() => navigate('/'));
-  }, [signOut, navigate]);
-
-  return <div>Cerrando sesión...</div>;
-};
-
-export default SignOut; */
-
-// src/components/SignOut.jsx
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStorage } from '../stores/useUserStorage';
