@@ -1,110 +1,107 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useUserStorage } from '../../stores/useUserStorage';
+
+import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../../auth/supabase.auth";
+import styles from "./SignUp.module.css";
 
 export default function SignUp() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    fullName: '',
-    phone: ''
-  });
-  
-  const { signUp, loading, error } = useUserStorage();
+  const emailRef = useRef();
+  const passwordRef = useRef();
+  const nombreRef = useRef();
+  const apellidoRef = useRef();
+  const telefonoRef = useRef();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await signUp(
-        formData.email,
-        formData.password,
-        formData.fullName,
-        formData.phone
-      );
-      navigate('/signin'); // Redirige al login después del registro
-    } catch (err) {
-      console.error("Error en registro:", err);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+
+  const handleSignUp = async () => {
+    setLoading(true);
+    setError(null);
+    setMessage(null);
+
+    const email = emailRef.current.value.trim();
+    const password = passwordRef.current.value;
+    const nombre = nombreRef.current.value.trim();
+    const apellido = apellidoRef.current.value.trim();
+    const telefono = telefonoRef.current.value.trim();
+
+    if (!email || !password || !nombre || !apellido || !telefono) {
+      setError("Completá todos los campos.");
+      setLoading(false);
+      return;
     }
+
+    const { data, error: signErr } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { nombre, apellido, telefono },
+      },
+    });
+
+    if (signErr) {
+      setError(signErr.message);
+    } else {
+      setMessage(
+        "📩 Registrado exitosamente. Verificá tu email para activar la cuenta."
+      );
+
+      // ⏳ Espera 3 segundos y redirige a /signin
+      setTimeout(() => {
+        navigate("/signin");
+      }, 3000);
+    }
+
+    setLoading(false);
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Registro de Cliente</h2>
-      
-      {/* Mostrar error si existe */}
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-          {error}
-        </div>
-      )}
+    <div className={styles.container}>
+      <h2 className={styles.title}>Crear cuenta</h2>
+      <input
+        ref={nombreRef}
+        type="text"
+        placeholder="Nombre"
+        className={styles.input}
+      />
+      <input
+        ref={apellidoRef}
+        type="text"
+        placeholder="Apellido"
+        className={styles.input}
+      />
+      <input
+        ref={telefonoRef}
+        type="tel"
+        placeholder="Teléfono"
+        className={styles.input}
+      />
+      <input
+        ref={emailRef}
+        type="email"
+        placeholder="Email"
+        className={styles.input}
+      />
+      <input
+        ref={passwordRef}
+        type="password"
+        placeholder="Contraseña"
+        className={styles.input}
+      />
+      <button
+        onClick={handleSignUp}
+        disabled={loading}
+        className={styles.button}
+      >
+        {loading ? "Registrando..." : "Registrarse"}
+      </button>
 
-      {/* Formulario de registro */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1">Nombre Completo</label>
-          <input
-            type="text"
-            value={formData.fullName}
-            onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Teléfono</label>
-          <input
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Email</label>
-          <input
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({...formData, email: e.target.value})}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Contraseña</label>
-          <input
-            type="password"
-            value={formData.password}
-            onChange={(e) => setFormData({...formData, password: e.target.value})}
-            className="w-full p-2 border rounded"
-            minLength={6}
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-green-600 text-white p-2 rounded disabled:bg-gray-400"
-        >
-          {loading ? 'Registrando...' : 'Crear cuenta'}
-        </button>
-      </form>
-
-      {/* Enlace para volver a login */}
-      <div className="mt-4 text-center">
-        <span className="text-gray-600">¿Ya tienes cuenta? </span>
-        <Link 
-          to="/signin" 
-          className="text-blue-600 hover:underline"
-        >
-          Inicia sesión
-        </Link>
-      </div>
+      {error && <p className={styles.error}>{error}</p>}
+      {message && <p className={styles.success}>{message}</p>}
     </div>
   );
 }
+
+

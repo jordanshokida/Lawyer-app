@@ -1,64 +1,74 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Importa Link
-import { useUserStorage } from '../../stores/useUserStorage';
 
-export default function SignIn() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { signIn, loading, error } = useUserStorage();
+// src/components/SignIn/SignIn.jsx
+import { useNavigate, Link } from "react-router-dom";
+import { useUserStorage } from "../../stores/useUserStorage";
+import { supabase } from "../../auth/supabase.auth";
+import { useEffect } from "react";
+import styles from "./SignIn.module.css";
+
+const SignIn = () => {
   const navigate = useNavigate();
+  const setUser = useUserStorage((s) => s.setUser);
+  const user = useUserStorage((s) => s.user);
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    if (user) {
+      navigate("/turno");
+    }
+  }, [user, navigate]);
+
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    try {
-      await signIn(email, password);
-      navigate('/turnos');
-    } catch (err) {
-      console.error("Error:", err);
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert("Error al ingresar: " + error.message);
+    } else {
+      const userData = data.user;
+      const isAdmin = userData.email === "abogado@miapp.com";
+      setUser({ ...userData, isAdmin });
+      navigate("/turno");
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Iniciar Sesión</h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className={styles.container}>
+      <h2 className={styles.title}>Iniciar sesión</h2>
+      <form onSubmit={handleSignIn}>
         <input
+          className={styles.input}
+          name="email"
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          className="w-full p-2 border rounded"
+          placeholder="Correo electrónico"
           required
         />
         <input
+          className={styles.input}
+          name="password"
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           placeholder="Contraseña"
-          className="w-full p-2 border rounded"
           required
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white p-2 rounded disabled:bg-gray-400"
-        >
-          {loading ? 'Cargando...' : 'Entrar'}
+        <button type="submit" className={styles.button}>
+          Ingresar
         </button>
       </form>
-
-      {/* Botón de registro */}
-      <div className="mt-4 text-center">
-        <span className="text-gray-600">¿No tienes cuenta? </span>
-        <Link 
-          to="/signup" 
-          className="text-blue-600 hover:underline"
-        >
-          Regístrate aquí
+      <p style={{ textAlign: "center", marginTop: "1rem" }}>
+        ¿No tenés cuenta?{" "}
+        <Link to="/signup" style={{ color: "#800020", fontWeight: "bold" }}>
+          Registrate
         </Link>
-      </div>
+      </p>
     </div>
   );
-}
+};
+
+export default SignIn;
+
+

@@ -1,5 +1,3 @@
-import React from "react";
-import abogado from '/abogado.png'; 
 const LegalLanding = () => {
   return (
     <section className="bg-[#fdf6e3] text-[#4b1c1c] py-10 px-4">
@@ -7,7 +5,7 @@ const LegalLanding = () => {
         {/* Imagen */}
         <div className="w-full md:w 1">
           <img
-            src={abogado}
+            src="/abogado.png"
             alt="Imagen del abogado"
             className="rounded-2xl shadow-lg w-full h-[400px] object-cover"
           />
