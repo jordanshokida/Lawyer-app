@@ -1,4 +1,4 @@
-// src/components/LandingPage/FooterInfo.jsx
+
 import React from 'react';
 
 const FooterInfo = () => {
