@@ -1,74 +1,73 @@
-import React, { useRef, useState } from 'react';
-import styles from "./SignIn.module.css"
-import { useNavigate } from 'react-router';
-import { signIn } from '../../auth/auth.service';
-//import { useUserStorage } from '../../stores/useUserStorage';
-import { supabase } from '../../auth/supabase.auth';
+// src/components/SignIn/SignIn.jsx
+import { useNavigate, Link } from "react-router-dom";
+import { useUserStorage } from "../../stores/useUserStorage";
+import { supabase } from "../../auth/supabase.auth";
+import { useEffect } from "react";
+import styles from "./SignIn.module.css";
 
-export default function SignIn() {
-  const emailRef = useRef('');
-  const passwordRef = useRef('');
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+const SignIn = () => {
+  const navigate = useNavigate();
+  const setUser = useUserStorage((s) => s.setUser);
+  const user = useUserStorage((s) => s.user);
 
-  const { setUser, setFavorites } = useUserStorage()
-
-  const handleLogin = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-
-      const { user } = await signIn(emailRef.current.value, passwordRef.current.value);
-
-      setUser(user)
-
-      const { data: fav, error } = await supabase
-        .from("favorites")
-        .select("recipe_id")
-        .eq("user_id", user.id)
-
-
-      let setInitData = fav ? fav.map(f => f.recipe_id) : []
-
-      setFavorites(setInitData)
-
-      navigate("/profile")
-    } catch (err) {
-      console.error(err.message);
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (user) {
+      navigate("/turno");
     }
-  }
+  }, [user, navigate]);
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert("Error al ingresar: " + error.message);
+    } else {
+      const userData = data.user;
+      const isAdmin = userData.email === "abogado@miapp.com";
+      setUser({ ...userData, isAdmin });
+      navigate("/turno");
+    }
+  };
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Login</h2>
-
-      <input
-        ref={emailRef}
-        type="email"
-        placeholder="Email"
-        className={styles.input}
-      />
-
-      <input
-        ref={passwordRef}
-        type="password"
-        placeholder="Contraseña"
-        className={styles.input}
-      />
-
-      <button
-        onClick={handleLogin}
-        disabled={loading}
-        className={styles.button}
-      >
-        {loading ? 'Cargando...' : 'Entrar'}
-      </button>
-
-      {error && <p className={styles.error}>{error}</p>}
+      <h2 className={styles.title}>Iniciar sesión</h2>
+      <form onSubmit={handleSignIn}>
+        <input
+          className={styles.input}
+          name="email"
+          type="email"
+          placeholder="Correo electrónico"
+          required
+        />
+        <input
+          className={styles.input}
+          name="password"
+          type="password"
+          placeholder="Contraseña"
+          required
+        />
+        <button type="submit" className={styles.button}>
+          Ingresar
+        </button>
+      </form>
+      <p style={{ textAlign: "center", marginTop: "1rem" }}>
+        ¿No tenés cuenta?{" "}
+        <Link to="/signup" style={{ color: "#800020", fontWeight: "bold" }}>
+          Registrate
+        </Link>
+      </p>
     </div>
   );
-}
+};
+
+export default SignIn;
+
+

@@ -162,9 +162,9 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(253, 246, 227, 0.9); /* fondo vainilla */
+    background: rgba(128, 0, 0, 0.9); /* bordó translúcido */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
+  }
 
 .NavBar__left {
     display: flex;

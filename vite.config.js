@@ -3,18 +3,16 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// manifesto -> necesario para ser reconocida por la depedencia.
-//
 const manifestForPlugin = {
   registerType: 'autoUpdate',
   includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logo.png'],
   strategies: 'generateSW',
   manifest: {
-    name: 'RecetApp',
-    short_name: 'recetApp',
-    description: 'App de recetas offline',
-    theme_color: '#1a1a1a',
-    background_color: '#1a1a1a',
+    name: 'Lawyer App',
+    short_name: 'LawyerApp',
+    description: 'App de turnos y contacto para abogado',
+    theme_color: '#800000', // Bordó
+    background_color: '#ffffff',
     start_url: '/',
     scope: '/',
     display: 'standalone',
@@ -27,7 +25,7 @@ const manifestForPlugin = {
         purpose: 'any'
       },
       {
-        src: 'chile.png',
+        src: 'logo.png',
         sizes: '512x512',
         type: 'image/png',
         purpose: 'any maskable'
@@ -35,19 +33,28 @@ const manifestForPlugin = {
     ]
   },
   devOptions: {
-    enabled: true,
-    navigateFallback: 'index.html'
+    enabled: true
+  },
+  workbox: {
+    // Evitar que el service worker sirva de fallback (navegación) estas rutas (dinámicas con datos)
+    navigateFallback: 'index.html',
+    navigateFallbackDenylist: [
+      /^\/turno/,
+      /^\/signin/,
+      /^\/signup/,
+      /^\/profile/,
+      /^\/signout/
+    ]
   }
 }
 
-// configurador de la dependencia.
 export default defineConfig({
   plugins: [react(), tailwindcss(), VitePWA(manifestForPlugin)],
-
   server: {
     host: true
   },
   build: {
     sourcemap: true
   }
-});
+})
+
