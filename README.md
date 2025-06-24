@@ -67,8 +67,7 @@ La app se encuentra desplegada en **Netlify**.
 
 ---
 
-
-https://abogado-turnos.netlify.app
+https://estudio-juridico-app.netlify.app/
 
 ---
 
