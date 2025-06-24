@@ -14,28 +14,27 @@ const App = () => {
       const { data } = await supabase.auth.getSession();
       const sessionUser = data?.session?.user;
       if (sessionUser) {
-        const isAdmin = sessionUser.email === "abogado@miapp.com";
-        setUser({ ...sessionUser, isAdmin });
+        setUser(sessionUser); // ✅ Limpio
       }
     };
-
+  
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_IN" && session?.user) {
-          const isAdmin = session.user.email === "abogado@miapp.com";
-          setUser({ ...session.user, isAdmin });
+          setUser(session.user); // ✅ Limpio
         }
-
+  
         if (event === "SIGNED_OUT") {
           reset();
         }
       }
     );
-
+  
     cargarSesionActual();
-
+  
     return () => listener?.subscription?.unsubscribe();
   }, [setUser, reset]);
+  
 
   return (
     <div className="bg-[#fdf6e3] min-h-screen flex flex-col">
